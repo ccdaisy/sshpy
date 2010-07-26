@@ -1,0 +1,52 @@
+# AUTHOR:	ccdaisy <daisy.li1989@gmail.com>
+# CREATED:	26 July 2010
+# KEYWORD:	ssh, python
+
+
+#             sshpy HOW-TO
+# step 1.
+#	install python and python module "pexpect"
+#	(if you use redhat\centos\fedora, try "yum search")
+#	(if you use ubuntu, try "apt-cache search") 
+#
+#
+# step 2.
+# 	modify the python dict below:
+#	
+
+user_ip_pass = {
+"to-be-named-1":["192.168.23.23","58422","root","xxxxxxxx",
+     {
+            "to-be-named-2":["10.10.123.100","22","admin",""],
+            "to-be-named-3":["10.10.123.101","8022","root","xxxxxxxx"],
+     }
+    ],
+"to-be-named-4":["192.168.23.23","58422","root","xxxxxxxx"]
+}
+
+#	the key in this dict is the name for the login information.
+#	the value is an array. Here is the definition of the array.
+#		1:hostname
+#		2:port
+#		3:user
+#		4:password 
+#		
+#
+# step 3.
+#	for example, if you need to login server "to-be-named-1" in 
+#	order to login server "to-be-named-2", you only need to ty-
+#	-pe the following command:
+#		./sshpy to-be-named-1 to-be-named-2
+#
+#	if you forgot the information defined in the user_ip_pass. 
+#	type this one:
+#		./sshpy
+#	
+#	then some login information will be shown.
+#
+# finally.
+#	the command "ifconfig | grep inet\ addr" will be executed 
+#	if you successfully login for safety. ( to ensure you ar-
+#	-e currently using the right machine.)
+#
+#	enjoy it~ :)

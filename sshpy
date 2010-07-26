@@ -1,0 +1,112 @@
+#!/usr/bin/python
+import os,sys,pexpect,string
+
+
+# AUTHOR:	ccdaisy <daisy.li1989@gmail.com>
+# CREATED:	26 July 2010
+# KEYWORD:	ssh, python
+
+
+#             sshpy HOW-TO
+# step 1.
+#	install python and python module "pexpect"
+#	(if you use redhat\centos\fedora, try "yum search")
+#	(if you use ubuntu, try "apt-cache search") 
+#
+#
+# step 2.
+# 	modify the python dict below:
+#	
+
+user_ip_pass = {
+"to-be-named-1":["192.168.23.23","58422","root","xxxxxxxx",
+     {
+            "to-be-named-2":["10.10.123.100","22","admin",""],
+            "to-be-named-3":["10.10.123.101","8022","root","xxxxxxxx"],
+     }
+    ],
+"to-be-named-4":["192.168.23.23","58422","root","xxxxxxxx"]
+}
+
+#	the key in this dict is the name for the login information.
+#	the value is an array. Here is the definition of the array.
+#		1:hostname
+#		2:port
+#		3:user
+#		4:password 
+#		
+#
+# step 3.
+#	for example, if you need to login server "to-be-named-1" in 
+#	order to login server "to-be-named-2", you only need to ty-
+#	-pe the following command:
+#		./sshpy to-be-named-1 to-be-named-2
+#
+#	if you forgot the information defined in the user_ip_pass. 
+#	type this one:
+#		./sshpy
+#	
+#	then some login information will be shown.
+#
+# finally.
+#	the command "ifconfig | grep inet\ addr" will be executed 
+#	if you successfully login for safety. ( to ensure you ar-
+#	-e currently using the right machine.)
+#
+#	enjoy it~ :)
+
+def ssh_server():
+    args                         = sys.argv
+    if len(args)==1:
+        while True:
+            print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            for k,v in user_ip_pass.iteritems():
+                print '''%s -> Host : %s, User : %s.'''%(k,v[0],v[2])
+            address              = raw_input("Make your choice:\n")
+            if user_ip_pass.has_key(address):
+                address2         = "0"
+                if len(user_ip_pass[address]) == 5:
+                    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+                    for k,v in user_ip_pass[address][4].iteritems():
+                        print '''%s -> Host : %s, User : %s.'''%(k,v[0],v[2])    
+                    while True:
+                        address2 = raw_input("Make your choice, print 0 to ssh without any further:\n")
+                        if address2 == "0":
+                            break
+                        elif user_ip_pass[address][4].has_key(address2): 
+                            break
+                        else:
+                            print "currently do not supports:%s"%address2
+                break
+            elif address=="bye":
+                return    
+            else:
+                print "currently do not supports:%s"%address
+    elif len(args)==2:
+        address                  = args[1];
+        address2                 = "0";
+    elif len(args)==3:
+        address                  = args[1];
+        address2                 = args[2];
+    else:
+        print "invalid argument number"
+    url                          = '''ssh -p %s %s@%s'''%(user_ip_pass[address][1],user_ip_pass[address][2],user_ip_pass[address][0])
+    try:  
+        p                        = pexpect.spawn(url)
+        if user_ip_pass[address][3] != "":
+            p.expect("password:")
+            p.sendline(user_ip_pass[address][3])
+        if address2 !="0":
+            second               = user_ip_pass[address][4][address2]
+            url2                 = '''ssh -p %s %s@%s'''%(second[1],second[2],second[0])
+            p.expect('[#\$] ')
+            p.sendline(url2)
+            if second[3] != "":
+                p.expect("password:")
+                p.sendline(second[3])
+        p.sendline("ifconfig | grep inet\ addr");
+        p.interact()  
+    except:
+        print str(p)
+        print "connection close()"  
+ssh_server()
